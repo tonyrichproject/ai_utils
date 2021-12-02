@@ -106,6 +106,14 @@ class AiBaseItem {
   }
 
   AiBaseItem findByObject(AiBaseItem aObject) => isSameObject(aObject) ? this : null;
+
+  @protected
+  bool internalIsEqualTo(AiBaseItem aComparisonObject) => false;
+  // to be implemented when descendant need to compare properties of two objects that are similar class
+
+  bool isEqualTo(AiBaseItem aComparisonObject) {
+    return (aComparisonObject != null && internalIsEqualTo(aComparisonObject));
+  }
 }
 
 /// ---------------------------------------------------------------------------------
@@ -173,6 +181,17 @@ class AiBaseList extends AiBaseItem {
       return aObject;
     else
       return null;
+  }
+
+  AiBaseItem itemByObjectValue(AiBaseItem aComparisonObject) {
+    if (aComparisonObject == null) return null;
+    // bool result = false;
+    for (var i = 0; i < count; i++) {
+      // Compare two objects by values
+      var currItem = getItem(i);
+      if (currItem.isEqualTo(aComparisonObject)) return currItem;
+    }
+    return null;
   }
 
   // Transfer methods and properties
