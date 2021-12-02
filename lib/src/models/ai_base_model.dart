@@ -210,7 +210,7 @@ class AiBaseList extends AiBaseItem {
 
   void printItems() {
     if (AiDebugger.instance.isLogEnabled && this.isNotEmpty) {
-      for (var i = 0; i < count - 1; i++) {
+      for (var i = 0; i < count; i++) {
         print('Debugging from AI Base List : ${this.runtimeType} -> Item Class ${getItem(i).runtimeType} Index : ${getItem(i).index}');
       }
     }
