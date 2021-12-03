@@ -112,7 +112,7 @@ class AiBaseItem {
   // to be implemented when descendant need to compare properties of two objects that are similar class
 
   bool isEqualTo(AiBaseItem aComparisonObject) {
-    return (aComparisonObject != null && internalIsEqualTo(aComparisonObject));
+    return (aComparisonObject != null && aComparisonObject.runtimeType == this.runtimeType && internalIsEqualTo(aComparisonObject));
   }
 }
 
