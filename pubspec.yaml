@@ -12,6 +12,8 @@ dependencies:
   flutter:
     sdk: flutter
   http: ^0.13.1
+  intl: ^0.17.0
+  animator: ^3.0.0
 
 dev_dependencies:
   flutter_test:

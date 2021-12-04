@@ -8,7 +8,6 @@ typedef OnItemSelectNotifyEvent = void Function(AiBaseItem selectItem);
 class AiBaseItem {
   int id = 0;
   int tag = 0;
-  // int itemIndex = -1;
 
   // event that can assign from outside the class
   OnItemSelectNotifyEvent onSelectItemEvent;
@@ -74,7 +73,6 @@ class AiBaseItem {
   void internalClearData() {
     id = 0;
     tag = 0;
-    // itemIndex = -1;
     // to be implemented
   }
 
@@ -202,14 +200,6 @@ class AiBaseList extends AiBaseItem {
   bool get isNotEmpty => items.isNotEmpty;
   bool remove(AiBaseItem aItem) => items.remove(aItem);
   AiBaseItem removeAt(int aIndex) => items.removeAt(aIndex);
-
-  // bool remove(AiBaseItem aItem) {
-  //   // return items.remove(aItem);
-  //   // bool result = (aItem != null && items.indexOf(aItem) != null);
-  //   bool result = itemByObject(aItem) != null;
-  //   if (result) result = items.remove(aItem);
-  //   return result;
-  // }
 
   void addItem(AiBaseItem item) {
     items.add(item);
