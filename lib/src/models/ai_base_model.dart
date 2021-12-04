@@ -89,9 +89,9 @@ class AiBaseItem {
     // to be implemented
   }
 
-  bool loadFromRawJsonDataObj(dynamic aRawJsonDataObj) {
+  bool loadFromRawJsonDataObj(dynamic aRawJsonDataObj, {bool aIsClearBoforeLoad = true}) {
     bool result;
-    clearData();
+    if (aIsClearBoforeLoad) clearData();
     result = (aRawJsonDataObj != null && internalIsValidJsonObj(aRawJsonDataObj));
     if (result) internalLoadFromRawJsonDataObj(aRawJsonDataObj);
     return result;
