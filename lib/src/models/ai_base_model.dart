@@ -282,6 +282,16 @@ mixin AiHttpListLoaderMixin on AiBaseList {
 }
 
 /// ----------------------------------------------------------------------------------------------------------
+mixin AiMapExportMixin on AiBaseItem {
+  @protected
+  Map<String, dynamic> internalGetDataAsMap() => {
+        // to be implemented
+      };
+
+  Map<String, dynamic> get dataAsMap => internalGetDataAsMap();
+}
+
+/// ----------------------------------------------------------------------------------------------------------
 class AiBasicItem extends AiBaseItem with AiHttpItemLoaderMixin {
   AiBasicItem({int id}) : super(id: id);
 }
