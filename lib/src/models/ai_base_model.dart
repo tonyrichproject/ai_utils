@@ -282,7 +282,7 @@ mixin AiHttpListLoaderMixin on AiBaseList {
 }
 
 /// ----------------------------------------------------------------------------------------------------------
-mixin AiMapExportMixin on AiBaseItem {
+mixin AiMapExporterMixin on AiBaseItem {
   @protected
   Map<String, dynamic> internalGetDataAsMap() => {
         // to be implemented
@@ -292,13 +292,13 @@ mixin AiMapExportMixin on AiBaseItem {
 }
 
 /// ----------------------------------------------------------------------------------------------------------
-class AiBasicItem extends AiBaseItem with AiHttpItemLoaderMixin {
+class AiBasicItem extends AiBaseItem with AiHttpItemLoaderMixin, AiMapExporterMixin {
   AiBasicItem({int id}) : super(id: id);
 }
 
 /// ----------------------------------------------------------------------------------------------------------
 /// subclass should be inherit from AiBasicList
-class AiBasicList extends AiBaseList with AiHttpListLoaderMixin {
+class AiBasicList extends AiBaseList with AiHttpListLoaderMixin, AiMapExporterMixin {
   @override
   AiBaseItem getNewObjItem() => AiBasicItem();
 
@@ -319,7 +319,7 @@ class AiBasicList extends AiBaseList with AiHttpListLoaderMixin {
 }
 
 /// ----------------------------------------------------------------------------------------------------------
-class AiDebugger extends AiBaseItem {
+class AiDebugger extends AiBasicItem {
   // static bool logEnabled = true;
 
   bool _logEnabled = true;
