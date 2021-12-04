@@ -1,13 +1,19 @@
+import 'package:ai_base_class/ai_base_class.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 typedef OnItemSelectNotifyEvent = void Function(AiBaseItem selectItem);
 
-/// ---------------------------------------------------------------------------------
+/// ----------------------------------------------------------------------------------------------------------
 class AiBaseItem {
   int id = 0;
   int tag = 0;
+
+  /* Print debug */
+  void debug(dynamic aObject) {
+    if (AiDebugger.instance.isLogEnabled && aObject != null) print('Debugging from AI Class name : ${this.runtimeType} - $aObject');
+  }
 
   // event that can assign from outside the class
   OnItemSelectNotifyEvent onSelectItemEvent;
@@ -27,7 +33,7 @@ class AiBaseItem {
       internalDoOnSelectItemEvent(this);
   }
 
-  AiBaseItem({this.id});
+  AiBaseItem({this.id = 0, this.tag = 0});
 
   @protected
   List<String> getMapKeys() => [];
@@ -40,34 +46,38 @@ class AiBaseItem {
   Map<String, dynamic> asMap() => internalAsMap();
 
   @protected
-  void internalCopyFrom(dynamic aSource) {
+  bool internalCopyFrom(dynamic aSource) {
     AiBaseItem source = aSource as AiBaseItem;
-    this.onSelectItemEvent = source.onSelectItemEvent;
     this.id = source.id;
     this.tag = source.tag;
+    return true;
   }
 
   bool copyFrom(dynamic aSource) {
     if (aSource != null && aSource.runtimeType == this.runtimeType) {
-      internalCopyFrom(aSource);
-      return true;
+      return internalCopyFrom(aSource);
     } else
       return false;
   }
 
+  @protected
+  bool internalCloneFrom(AiBaseItem aAiSource) {
+    bool result = copyFrom(aAiSource);
+    // Clone will also copy event pointer to current object
+    if (result) this.onSelectItemEvent = aAiSource.onSelectItemEvent;
+    return result;
+  }
+
+  bool cloneFrom(AiBaseItem aAiSource) => internalCloneFrom(aAiSource);
+
   /* check if object empty by validate to some property of object */
   @protected
-  bool get internalIsEmpty => id == 0;
+  bool get internalIsEmpty => true;
+  // To be implemented
 
   /* external call */
   bool get isEmpty => internalIsEmpty;
-
   bool get isNotEmpty => !(isEmpty);
-
-  /* Print debug */
-  void debug(dynamic aObject) {
-    if (AiDebugger.instance.isLogEnabled && aObject != null) print('Debugging from AI Class name : ${this.runtimeType} - $aObject');
-  }
 
   @protected
   void internalClearData() {
@@ -114,12 +124,9 @@ class AiBaseItem {
   }
 }
 
-/// ---------------------------------------------------------------------------------
+/// ----------------------------------------------------------------------------------------------------------
 class AiBaseList extends AiBaseItem {
   List<AiBaseItem> _objList;
-
-  // @protected
-  // Type getItemType() => getNewObjItem().runtimeType;
 
   @protected
   AiBaseItem getNewObjItem() => AiBaseItem(); // return object item of list
@@ -143,18 +150,37 @@ class AiBaseList extends AiBaseItem {
     if (aMapList != null && aMapList.isNotEmpty) internalLoadFromMapList(aMapList);
   }
 
-  bool cloneFrom(AiBaseList aSourceList) {
-    if (aSourceList != null && aSourceList.isNotEmpty)
-      return internalCloneFrom(aSourceList);
-    else
+  @override
+  bool internalCopyFrom(aSource) {
+    // Only copy data
+    bool result = super.internalCopyFrom(aSource);
+    if (result && isAvailable(aSource as AiBaseList)) {
+      var sourceList = aSource as AiBaseList;
+      sourceList.items.forEach((AiBaseItem sourceItem) {
+        // Copy data from source item to new item except notify event
+        addItem(getNewObjItem()..copyFrom(sourceItem));
+      });
+      return this.isNotEmpty;
+    } else
       return false;
   }
 
-  @protected
-  bool internalCloneFrom(AiBaseList aSourceList) {
-    clear();
-    aSourceList.items.forEach((sourceItem) => addItem(getNewObjItem()..copyFrom(sourceItem)));
-    return this.count > 0;
+  @override
+  bool internalCloneFrom(AiBaseItem aAiSource) {
+    // Call super clone to check same type of class and copy all data and event
+    var result = super.internalCloneFrom(aAiSource);
+    // Check if Source list is not empty
+    if (result && isAvailable(aAiSource)) {
+      // Now the aAiSource will be inherited from AiBaseList
+      var sourceList = aAiSource as AiBaseList;
+      // Iterate thourgh source items
+      sourceList.items.forEach((AiBaseItem sourceItem) {
+        this.addItem(getNewObjItem()..cloneFrom(sourceItem));
+        // add new item and clone all data and event
+      });
+      return this.isNotEmpty;
+    } else
+      return false;
   }
 
   @override
@@ -167,14 +193,6 @@ class AiBaseList extends AiBaseItem {
   }
 
   AiBaseItem itemByObject(AiBaseItem aObject) {
-    // AiBaseItem resultObj;
-    // if (aObject != null) {
-    //   for (var i = 0; i < this.count; i++) {
-    //     resultObj = items[i].findByObject(aObject);
-    //     if (resultObj != null) break;
-    //   }
-    // }
-    // return resultObj;
     if (aObject != null && items.indexOf(aObject) > -1)
       return aObject;
     else
@@ -226,7 +244,7 @@ class AiBaseList extends AiBaseItem {
   }
 }
 
-/// ---------------------------------------------------------------------------------
+/// ----------------------------------------------------------------------------------------------------------
 mixin AiHttpItemLoaderMixin on AiBaseItem {
   bool canLoadFromMap(Map<String, dynamic> aMap, List<String> aKeys) {
     var valid = (aMap != null) && (aKeys.isNotEmpty);
@@ -252,7 +270,7 @@ mixin AiHttpItemLoaderMixin on AiBaseItem {
   }
 }
 
-/// ---------------------------------------------------------------------------------
+/// ----------------------------------------------------------------------------------------------------------
 mixin AiHttpListLoaderMixin on AiBaseList {
   // implement load from http response list
   loadFromHttpData(http.Response aResponseList, [bool aIsClearBeforeLoad = true]) {
@@ -263,12 +281,12 @@ mixin AiHttpListLoaderMixin on AiBaseList {
   }
 }
 
-// / ---------------------------------------------------------------------------------
+/// ----------------------------------------------------------------------------------------------------------
 class AiBasicItem extends AiBaseItem with AiHttpItemLoaderMixin {
   AiBasicItem({int id}) : super(id: id);
 }
 
-/// ---------------------------------------------------------------------------------
+/// ----------------------------------------------------------------------------------------------------------
 /// subclass should be inherit from AiBasicList
 class AiBasicList extends AiBaseList with AiHttpListLoaderMixin {
   @override
@@ -290,8 +308,7 @@ class AiBasicList extends AiBaseList with AiHttpListLoaderMixin {
   }
 }
 
-// / ---------------------------------------------------------------------------------
-
+/// ----------------------------------------------------------------------------------------------------------
 class AiDebugger extends AiBaseItem {
   // static bool logEnabled = true;
 
@@ -305,3 +322,5 @@ class AiDebugger extends AiBaseItem {
   bool get isLogEnabled => instance._logEnabled;
   static void enableLog(bool aIsEnabled) => instance._logEnabled = aIsEnabled;
 }
+
+/// ----------------------------------------------------------------------------------------------------------
