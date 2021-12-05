@@ -10,11 +10,6 @@ class AiBaseItem {
   int id = 0;
   int tag = 0;
 
-  /* Print debug */
-  void debug(dynamic aObject) {
-    if (AiDebugger.instance.isLogEnabled && aObject != null) print('Debugging from AI Class name : ${this.runtimeType} - $aObject');
-  }
-
   // event that can assign from outside the class
   OnItemSelectNotifyEvent onSelectItemEvent;
 
@@ -122,6 +117,11 @@ class AiBaseItem {
   bool isEqualTo(AiBaseItem aComparisonObject) {
     return (aComparisonObject != null && aComparisonObject.runtimeType == this.runtimeType && internalIsEqualTo(aComparisonObject));
   }
+
+  /* Print debug */
+  void debug(dynamic aObject) {
+    if (AiDebugger.instance.isLogEnabled && aObject != null) print('Debugging from AI Class name : ${this.runtimeType} - $aObject');
+  }
 }
 
 /// ----------------------------------------------------------------------------------------------------------
@@ -175,8 +175,8 @@ class AiBaseList extends AiBaseItem {
       var sourceList = aAiSource as AiBaseList;
       // Iterate thourgh source items
       sourceList.items.forEach((AiBaseItem sourceItem) {
-        this.addItem(getNewObjItem()..cloneFrom(sourceItem));
         // add new item and clone all data and event
+        this.addItem(getNewObjItem()..cloneFrom(sourceItem));
       });
       return this.isNotEmpty;
     } else
@@ -285,10 +285,20 @@ mixin AiHttpListLoaderMixin on AiBaseList {
 mixin AiMapExporterMixin on AiBaseItem {
   @protected
   Map<String, dynamic> internalGetDataAsMap() => {
-        // to be implemented
+        // to be implemented when object want to return map object
+        // to send through HTTPS in provider
       };
 
   Map<String, dynamic> get dataAsMap => internalGetDataAsMap();
+}
+
+/// ----------------------------------------------------------------------------------------------------------
+mixin AiDataToHttpParamMixin on AiBaseItem {
+  @protected
+  String internalGetDataAsHttpParam() => '';
+  // To be implemented when item can return http parameters
+
+  String get dataAsHttpParam => internalGetDataAsHttpParam();
 }
 
 /// ----------------------------------------------------------------------------------------------------------
