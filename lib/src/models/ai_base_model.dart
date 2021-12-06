@@ -28,7 +28,13 @@ class AiBaseItem {
       internalDoOnSelectItemEvent(this);
   }
 
+  // Basic Constructor
   AiBaseItem({this.id = 0, this.tag = 0});
+
+  // Named Constructor : create this class by link the event
+  AiBaseItem.createWithEvent(OnItemSelectNotifyEvent onSelectItemEvent, {this.id = 0, this.tag = 0}) {
+    this.onSelectItemEvent = onSelectItemEvent;
+  }
 
   @protected
   List<String> getMapKeys() => [];
@@ -81,7 +87,15 @@ class AiBaseItem {
     // to be implemented
   }
 
+  @protected
+  void internalReset() {
+    internalClearData();
+    onSelectItemEvent = null;
+  }
+
   void clearData() => internalClearData();
+  // Function reset will clear all data and also set event pointer to null
+  void reset() => internalReset();
 
   dynamic owner;
   int get index => (owner != null && owner is AiBaseList) ? (owner as AiBaseList).items.indexOf(this) : -1;
@@ -126,6 +140,13 @@ class AiBaseItem {
 
 /// ----------------------------------------------------------------------------------------------------------
 class AiBaseList extends AiBaseItem {
+  // Constructor pass id and tag to base class
+  AiBaseList({int id, int tag}) : super(id: id, tag: tag);
+
+  // Named constructor that pass paramaters to super.createWithEvent
+  AiBaseList.createWithEvent(OnItemSelectNotifyEvent onSelectItemEvent, {int id, int tag})
+      : super.createWithEvent(onSelectItemEvent, id: id, tag: tag);
+
   List<AiBaseItem> _objList;
 
   @protected
@@ -303,12 +324,24 @@ mixin AiDataToHttpParamMixin on AiBaseItem {
 
 /// ----------------------------------------------------------------------------------------------------------
 class AiBasicItem extends AiBaseItem with AiHttpItemLoaderMixin, AiMapExporterMixin {
-  AiBasicItem({int id}) : super(id: id);
+  // Constructor
+  AiBasicItem({int id, int tag}) : super(id: id, tag: tag);
+
+  // Name Constructor creat with event notification
+  AiBasicItem.createWithEvent(OnItemSelectNotifyEvent onSelectItemEvent, {int id, int tag})
+      : super.createWithEvent(onSelectItemEvent, id: id, tag: tag);
 }
 
 /// ----------------------------------------------------------------------------------------------------------
 /// subclass should be inherit from AiBasicList
 class AiBasicList extends AiBaseList with AiHttpListLoaderMixin, AiMapExporterMixin {
+  // Constructor
+  AiBasicList({int id, int tag}) : super(id: id, tag: tag);
+
+  // Named Constructor : create list with event link
+  AiBasicList.createWithEvent(OnItemSelectNotifyEvent onSelectItemEvent, {int id, int tag})
+      : super.createWithEvent(onSelectItemEvent, id: id, tag: tag);
+
   @override
   AiBaseItem getNewObjItem() => AiBasicItem();
 
