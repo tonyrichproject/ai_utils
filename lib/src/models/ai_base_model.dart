@@ -353,9 +353,8 @@ class AiBasicList extends AiBaseList with AiHttpListLoaderMixin, AiMapExporterMi
     aMapList.forEach(
       (item) {
         var mapItem = item as Map<String, dynamic>;
-        var newItem = this.getNewObjItem() as AiBasicItem;
+        var newItem = this.addNewObjItem() as AiBasicItem;
         newItem.loadFromMapItem(mapItem);
-        items.add(newItem);
       },
     );
   }
