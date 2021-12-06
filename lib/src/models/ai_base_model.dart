@@ -47,29 +47,33 @@ class AiBaseItem {
   Map<String, dynamic> asMap() => internalAsMap();
 
   @protected
-  bool internalCopyFrom(dynamic aSource) {
+  bool internalCopyFrom(dynamic aSource, {bool aIsClearBeforeCopy = true}) {
+    if (aIsClearBeforeCopy) clearData();
     AiBaseItem source = aSource as AiBaseItem;
     this.id = source.id;
     this.tag = source.tag;
     return true;
   }
 
-  bool copyFrom(dynamic aSource) {
+  bool copyFrom(dynamic aSource, {bool aIsClearBeforeCopy = true}) {
     if (aSource != null && aSource.runtimeType == this.runtimeType) {
-      return internalCopyFrom(aSource);
+      return internalCopyFrom(aSource, aIsClearBeforeCopy: aIsClearBeforeCopy);
     } else
       return false;
   }
 
   @protected
-  bool internalCloneFrom(AiBaseItem aAiSource) {
-    bool result = copyFrom(aAiSource);
+  bool internalCloneFrom(AiBaseItem aAiSource, {bool aIsClearBeforeClone = true}) {
+    bool result = copyFrom(aAiSource, aIsClearBeforeCopy: aIsClearBeforeClone);
     // Clone will also copy event pointer to current object
     if (result) this.onSelectItemEvent = aAiSource.onSelectItemEvent;
     return result;
   }
 
-  bool cloneFrom(AiBaseItem aAiSource) => internalCloneFrom(aAiSource);
+  bool cloneFrom(AiBaseItem aAiSource, {bool aIsClearBeforeClone = true}) => internalCloneFrom(
+        aAiSource,
+        aIsClearBeforeClone: aIsClearBeforeClone,
+      );
 
   /* check if object empty by validate to some property of object */
   @protected
@@ -172,45 +176,40 @@ class AiBaseList extends AiBaseItem {
   }
 
   @override
-  bool internalCopyFrom(aSource) {
+  bool internalCopyFrom(aSource, {bool aIsClearBeforeCopy = true}) {
     // Only copy data
-    bool result = super.internalCopyFrom(aSource);
-    // Clear before copy
-    clear();
+    bool result = super.internalCopyFrom(aSource, aIsClearBeforeCopy: aIsClearBeforeCopy);
     // Check if source list is available
     if (result && isAvailable(aSource as AiBaseList)) {
       var sourceList = aSource as AiBaseList;
-      sourceList.items.forEach((AiBaseItem sourceItem) {
-        // Copy data from source item to new item except notify event
-        addItem(getNewObjItem()..copyFrom(sourceItem));
-      });
+      // Copy data from source item to new item except notify event
+      sourceList.items.forEach((AiBaseItem sourceItem) => this.addNewObjItem()..copyFrom(sourceItem));
       return this.isNotEmpty;
     } else
       return false;
   }
 
   @override
-  bool internalCloneFrom(AiBaseItem aAiSource) {
+  bool internalCloneFrom(AiBaseItem aAiSource, {bool aIsClearBeforeClone = true}) {
     // Call super clone to check same type of class and copy all data and event
-    var result = super.internalCloneFrom(aAiSource);
-    // Clear before copy
-    clear();
+    var result = super.internalCloneFrom(aAiSource, aIsClearBeforeClone: aIsClearBeforeClone);
     // Check if Source list is not empty
     if (result && isAvailable(aAiSource)) {
       // Now the aAiSource will be inherited from AiBaseList
       var sourceList = aAiSource as AiBaseList;
       // Iterate thourgh source items
-      sourceList.items.forEach((AiBaseItem sourceItem) {
-        // add new item and clone all data and event
-        this.addItem(getNewObjItem()..cloneFrom(sourceItem));
-      });
+      //// add new item and clone all data and event
+      sourceList.items.forEach((AiBaseItem sourceItem) => this.addNewObjItem()..cloneFrom(sourceItem));
       return this.isNotEmpty;
     } else
       return false;
   }
 
   @override
-  void internalClearData() => clear();
+  void internalClearData() {
+    super.internalClearData();
+    clear();
+  }
 
   AiBaseItem getItem(int aIndex) {
     var result;
