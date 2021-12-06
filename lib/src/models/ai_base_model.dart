@@ -175,6 +175,9 @@ class AiBaseList extends AiBaseItem {
   bool internalCopyFrom(aSource) {
     // Only copy data
     bool result = super.internalCopyFrom(aSource);
+    // Clear before copy
+    clear();
+    // Check if source list is available
     if (result && isAvailable(aSource as AiBaseList)) {
       var sourceList = aSource as AiBaseList;
       sourceList.items.forEach((AiBaseItem sourceItem) {
@@ -190,6 +193,8 @@ class AiBaseList extends AiBaseItem {
   bool internalCloneFrom(AiBaseItem aAiSource) {
     // Call super clone to check same type of class and copy all data and event
     var result = super.internalCloneFrom(aAiSource);
+    // Clear before copy
+    clear();
     // Check if Source list is not empty
     if (result && isAvailable(aAiSource)) {
       // Now the aAiSource will be inherited from AiBaseList
