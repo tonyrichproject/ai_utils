@@ -29,7 +29,6 @@ abstract class AiBaseStatelessWidget extends StatelessWidget {
 }
 
 /* ------------------------------------------------------------------------------- */
-
 // ignore: must_be_immutable
 abstract class AiBaseStatefulWidget extends StatefulWidget {
   AiBaseStatefulWidget({Key key}) : super(key: key);
@@ -55,7 +54,7 @@ abstract class AiBaseState<Page extends AiBaseStatefulWidget> extends State<Page
 
   @override
   Widget build(BuildContext context) {
-    // pageContext = context;
+    // now pageContext property is same as context
     if (!AiDisplayAreaModel.initialized) AiDisplayAreaModel.instance.init(context);
     return internalBuild(context);
   }
@@ -65,4 +64,70 @@ abstract class AiBaseState<Page extends AiBaseStatefulWidget> extends State<Page
   }
 }
 
-/* ------------------------------------------------------------------------------- */
+// /* ------------------------------------------------------------------------------- */
+// mixin AiStatelessScaffoldMixin on AiBaseStatelessWidget {
+//   @protected
+//   Widget internalBuildScaffold(BuildContext context) {
+//     return Scaffold();
+//   }
+// }
+
+// /* ------------------------------------------------------------------------------- */
+// mixin AiStatefulScaffoldMixin on AiBaseState {
+//   @protected
+//   Widget internalBuildScaffold(BuildContext context) {
+//     return Scaffold();
+//   }
+// }
+
+// /* ------------------------------------------------------------------------------- */
+// // ignore: must_be_immutable
+// abstract class AiBasicStatelessWidget extends AiBaseStatelessWidget with AiStatelessScaffoldMixin {  
+//   @override
+//   Widget internalBuild(BuildContext context) {
+//     return internalBuildScaffold(context);
+//   }
+// }
+
+// /* ------------------------------------------------------------------------------- */
+// abstract class AiBasicStatfulWidget extends AiBaseStatefulWidget {
+//   AiBasicStatfulWidget({Key key}) : super(key: key);
+// }
+
+// /* ------------------------------------------------------------------------------- */
+// abstract class AiBasicState<AiBasicStatefulWidget extends AiBaseStatefulWidget> extends AiBaseState with AiStatefulScaffoldMixin {
+//   @override
+//   Widget internalBuild(BuildContext context) {
+//     return internalBuildScaffold(context);
+//   }
+// }
+
+// /* ------------------------------------------------------------------------------- */
+// class CustomBasicPage extends AiBaseStatefulWidget {
+//   @override
+//   CustomBasicPageState createState() => CustomBasicPageState();
+// }
+
+// class CustomBasicPageState<AiBasicStatefulWidget extends AiBaseStatefulWidget> extends AiBasicState<CustomBasicPage> {
+//   @protected
+//   AppBar internalBuildAppBar() {
+//     return AppBar();
+//   }  
+// }
+// /* ------------------------------------------------------------------------------- */
+// class TestPage extends CustomBasicPage {
+//   @override
+//   _TestPageState createState() => _TestPageState();
+// }
+
+// class _TestPageState extends CustomBasicPageState<TestPage> {
+  
+//   @override
+//   Widget internalBuildScaffold(BuildContext context) {    
+//     return Scaffold(
+//       appBar: this.internalBuildAppBar(),
+//       body: null,
+//     );
+//   }
+// }
+// /* ------------------------------------------------------------------------------- */

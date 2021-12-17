@@ -54,8 +54,9 @@ class AiBaseItem {
     return true;
   }
 
-  bool copyFrom(dynamic aSource) {
+  bool copyFrom(dynamic aSource, {bool aClearBeforeCopy = true}) {
     if (aSource != null && aSource.runtimeType == this.runtimeType) {
+      if (aClearBeforeCopy) clearData();
       return internalCopyFrom(aSource);
     } else
       return false;
@@ -63,7 +64,7 @@ class AiBaseItem {
 
   @protected
   bool internalCloneFrom(AiBaseItem aAiSource) {
-    bool result = copyFrom(aAiSource);
+    bool result = copyFrom(aAiSource, aClearBeforeCopy: true);
     // Clone will also copy event pointer to current object
     if (result) this.onSelectItemEvent = aAiSource.onSelectItemEvent;
     return result;
@@ -111,7 +112,7 @@ class AiBaseItem {
   bool loadFromRawJsonDataObj(dynamic aRawJsonDataObj, {bool aIsClearBoforeLoad = true}) {
     bool result;
     if (aIsClearBoforeLoad) clearData();
-    result = (aRawJsonDataObj != null && internalIsValidJsonObj(aRawJsonDataObj));
+    result = (assigned(aRawJsonDataObj) && internalIsValidJsonObj(aRawJsonDataObj));
     if (result) internalLoadFromRawJsonDataObj(aRawJsonDataObj);
     return result;
   }
@@ -176,7 +177,7 @@ class AiBaseList extends AiBaseItem {
     // Only copy data
     bool result = super.internalCopyFrom(aSource);
     // Clear items before copy from source list
-    this.clear();
+    // this.clear();
     // Check if source list is available
     if (result && isAvailable(aSource as AiBaseList)) {
       var sourceList = aSource as AiBaseList;
@@ -192,7 +193,7 @@ class AiBaseList extends AiBaseItem {
     // Call super clone to check same type of class and copy all data and event
     var result = super.internalCloneFrom(aAiSource);
     // Clear items before clone
-    this.clear();
+    // this.clear();
     // Check if Source list is not empty
     if (result && isAvailable(aAiSource)) {
       // Now the aAiSource will be inherited from AiBaseList
@@ -206,18 +207,22 @@ class AiBaseList extends AiBaseItem {
   }
 
   @protected
-  bool internalAppendByCopyFrom(AiBaseList aSourceList) {
+  bool internalAppendFrom(AiBaseList aSourceList) {
+    /// this id and tag will not copy from source
+    /// just copy items from source
     int currItemCount = this.count;
     aSourceList.items.forEach((AiBaseItem sourceItem) => this.addNewObjItem()..copyFrom(sourceItem));
     return this.count == currItemCount + aSourceList.count;
   }
 
   // Append list from the last item by not delete any item
-  bool appendByCopyFrom(AiBaseList aSourceList) {
+  bool appendFrom(AiBaseList aSourceList) {
     bool result = isAvailable(aSourceList) && aSourceList.runtimeType == this.runtimeType;
-    result = (result) ? internalAppendByCopyFrom(aSourceList) : false;
+    result = (result) ? internalAppendFrom(aSourceList) : false;
     return result;
   }
+
+  bool appendFromRawJsonDataObj(dynamic aRawJsonDataObj) => loadFromRawJsonDataObj(aRawJsonDataObj, aIsClearBoforeLoad: false);
 
   @override
   void internalClearData() {
